@@ -1,0 +1,8 @@
+#jwt
+jwt:
+  authorization: Authorization
+  # token-prefix
+  token-prefix: Bearer
+  # ??Base64????????
+  base64-secret: 1a2b3c
+  expiration-time: 604800 # 7天，s为单位 60 * 60 * 24 * 7
