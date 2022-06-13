@@ -42,7 +42,7 @@ public class JwtTokenUtils implements Serializable {
         long expiration = isRememberMe ? jwtSecurityProperties.getExpirationRemember() : jwtSecurityProperties.getExpirationTime();
         Date nowDate = new Date();
         Date expireDate = new Date(nowDate.getTime() + 1000 * expiration);
-        return Jwts.builder()
+        String token = Jwts.builder()
                 .setClaims(claims)
                 .setSubject(subject)
                 // 签发时间（iat）：荷载部分的标准字段之一，代表这个 JWT 的生成时间。
@@ -52,6 +52,7 @@ public class JwtTokenUtils implements Serializable {
                 // 设置生成签名的算法和秘钥
                 .signWith(SignatureAlgorithm.HS512, jwtSecurityProperties.getBase64Secret())
                 .compact();
+        return jwtSecurityProperties.getTokenPrefix() + " " + token;
     }
 
     /**

@@ -95,9 +95,18 @@ public class ResponseResult<T> implements Serializable {
      * @return cn.master.square.common.result.ResponseResult<E>
      */
     public static <E> ResponseResult<E> fail(String message, E data) {
-        ResponseResult<E> result = new ResponseResult<E>();
+        ResponseResult<E> result = new ResponseResult<>();
         result.setSuccess(ResultEnum.FAILED.getSuccess());
         result.setCode(ResultEnum.FAILED.getCode());
+        result.setMessage(message);
+        result.setData(data);
+        return result;
+    }
+
+    public static <E> ResponseResult<E> fail(int code, String message, E data) {
+        ResponseResult<E> result = new ResponseResult<>();
+        result.setSuccess(ResultEnum.FAILED.getSuccess());
+        result.setCode(code);
         result.setMessage(message);
         result.setData(data);
         return result;

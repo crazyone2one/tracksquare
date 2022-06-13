@@ -16,3 +16,6 @@ spring:
     url: jdbc:mysql://localhost:3306/track-square
     username: root
     password: admin
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl

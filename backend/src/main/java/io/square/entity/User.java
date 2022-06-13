@@ -103,7 +103,4 @@ public class User implements Serializable {
 
     @TableField("token")
     private String token;
-
-    @TableField(exist = false)
-    private String role;
 }
