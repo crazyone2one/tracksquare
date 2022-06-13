@@ -14,7 +14,7 @@
     </parent>
     <groupId>io.square</groupId>
     <artifactId>track-square</artifactId>
-    <version>${reversion}</version>
+    <version>1.0.0</version>
     <name>track square</name>
     <description>track square</description>
     <properties>

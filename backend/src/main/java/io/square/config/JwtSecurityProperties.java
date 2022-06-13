@@ -24,4 +24,6 @@ public class JwtSecurityProperties {
 
     /** 令牌过期时间 此处单位/毫秒 */
     private Long expirationTime;
+
+    private Long expirationRemember;
 }

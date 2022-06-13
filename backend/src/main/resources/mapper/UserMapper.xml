@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="io.square.mapper.UserMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="io.square.entity.User">
+        <id column="id" property="id" />
+        <result column="nick_name" property="nickName" />
+        <result column="name" property="name" />
+        <result column="email" property="email" />
+        <result column="password" property="password" />
+        <result column="status" property="status" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+        <result column="language" property="language" />
+        <result column="last_workspace_id" property="lastWorkspaceId" />
+        <result column="phone" property="phone" />
+        <result column="source" property="source" />
+        <result column="last_project_id" property="lastProjectId" />
+        <result column="create_user" property="createUser" />
+        <result column="platform_info" property="platformInfo" />
+        <result column="selenium_server" property="seleniumServer" />
+        <result column="token" property="token" />
+    </resultMap>
+
+</mapper>
