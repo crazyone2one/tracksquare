@@ -23,4 +23,10 @@ public class GlobalExceptionHandler {
     public ResponseResult<String> badCredentialsExceptionHandle(BadCredentialsException exception) {
         return ResponseResult.fail(HttpServletResponse.SC_FORBIDDEN,exception.getMessage(),null);
     }
+
+    @ExceptionHandler(BizException.class)
+    @ResponseBody
+    public ResponseResult<String> bizExceptionHandle(BizException exception) {
+        return ResponseResult.fail(HttpServletResponse.SC_BAD_REQUEST,exception.getMessage(),null);
+    }
 }
