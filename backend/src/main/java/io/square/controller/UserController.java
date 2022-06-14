@@ -1,7 +1,12 @@
 package io.square.controller;
 
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import io.square.common.ResponseResult;
+import io.square.entity.User;
+import io.square.service.UserService;
+import org.springframework.web.bind.annotation.*;
+
+import javax.annotation.Resource;
+import java.util.Map;
 
 /**
  * <p>
@@ -14,5 +19,16 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/user")
 public class UserController {
+    @Resource
+    UserService userService;
 
+    @PostMapping("/list/all/{page}/{limit}")
+    public ResponseResult<Map<String, Object>> getPageList(@PathVariable long limit, @PathVariable long page, @RequestBody User user) {
+        return userService.getPageList(user, page, limit);
+    }
+
+    @PostMapping("/update/current")
+    public ResponseResult<User> updateCurrentUser(@RequestBody User user) {
+        return userService.updateCurrentUser(user);
+    }
 }

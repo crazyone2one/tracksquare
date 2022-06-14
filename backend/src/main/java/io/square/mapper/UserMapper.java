@@ -1,8 +1,12 @@
 package io.square.mapper;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.toolkit.Constants;
 import io.square.entity.User;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
 /**
@@ -16,6 +20,16 @@ import org.apache.ibatis.annotations.Select;
 @Mapper
 public interface UserMapper extends BaseMapper<User> {
 
+    /**
+     *
+    根据用户名查询
+ * @param username
+ * @return io.square.entity.User
+     */
+
     @Select("select  * from `user` where name=#{username}")
     User findByUsername(String username);
+
+    @Select("select * from `user` ${ew.customSqlSegment}")
+    IPage<User> queryAll(@Param(Constants.WRAPPER) LambdaQueryWrapper<User> wrapper);
 }
