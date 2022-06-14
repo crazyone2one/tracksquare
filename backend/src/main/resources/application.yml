@@ -6,7 +6,7 @@ jwt:
   # secret
   base64-secret: 1a2b3c
   expiration-remember: 604800 # 7天，s为单位 60 * 60 * 24 * 7
-  expiration-time: 3600 # 1天
+  expiration-time: 86400 # 1天
 
 #spring
 spring:
