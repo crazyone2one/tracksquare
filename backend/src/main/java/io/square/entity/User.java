@@ -9,10 +9,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.io.Serializable;
 import java.time.LocalDate;
@@ -30,6 +27,7 @@ import java.time.LocalDate;
 @TableName("user")
 @Builder
 @AllArgsConstructor
+@NoArgsConstructor
 public class User implements Serializable {
 
     private static final long serialVersionUID = 1L;

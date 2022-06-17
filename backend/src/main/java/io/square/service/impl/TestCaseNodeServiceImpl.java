@@ -54,7 +54,7 @@ public class TestCaseNodeServiceImpl extends ServiceImpl<TestCaseNodeMapper, Tes
         LambdaQueryWrapper<TestCase> caseWrapper = new LambdaQueryWrapper<>();
         caseWrapper.eq(TestCase::getProjectId, projectId).in(TestCase::getNodeId, allModuleIdList).groupBy(TestCase::getNodeId);
         List<Map<String, Object>> moduleCountList = testCaseMapper.moduleCountByCollection(caseWrapper);
-        Map<String, Integer> moduleCountMap = parseModuleCountList(moduleCountList);
+        Map<String, Long> moduleCountMap = parseModuleCountList(moduleCountList);
         testCaseNodes.forEach(node -> {
             List<String> moduleIds = new ArrayList<>();
             nodeList(testCaseNodes, node.getId(), moduleIds);
@@ -219,15 +219,15 @@ public class TestCaseNodeServiceImpl extends ServiceImpl<TestCaseNodeMapper, Tes
         return list;
     }
 
-    private Map<String, Integer> parseModuleCountList(List<Map<String, Object>> moduleCountList) {
-        Map<String, Integer> returnMap = new HashMap<>();
+    private Map<String, Long> parseModuleCountList(List<Map<String, Object>> moduleCountList) {
+        Map<String, Long> returnMap = new HashMap<>();
         for (Map<String, Object> map : moduleCountList) {
             Object moduleIdObj = map.get("moduleId");
             Object countNumObj = map.get("countNum");
             if (moduleIdObj != null && countNumObj != null) {
                 String moduleId = String.valueOf(moduleIdObj);
                 try {
-                    Integer countNumInteger = (Integer) countNumObj;
+                    Long countNumInteger = (long) countNumObj;
                     returnMap.put(moduleId, countNumInteger);
                 } catch (Exception ignored) {
                 }

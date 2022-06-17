@@ -1,11 +1,13 @@
 package io.square.controller;
 
 import io.square.common.ResponseResult;
+import io.square.controller.request.QueryMemberRequest;
 import io.square.entity.User;
 import io.square.service.UserService;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -30,5 +32,10 @@ public class UserController {
     @PostMapping("/update/current")
     public ResponseResult<User> updateCurrentUser(@RequestBody User user) {
         return userService.updateCurrentUser(user);
+    }
+
+    @PostMapping("/project/member/tester/list")
+    public ResponseResult<List<User>> getProjectMember(@RequestBody QueryMemberRequest request) {
+        return userService.getProjectMember(request);
     }
 }

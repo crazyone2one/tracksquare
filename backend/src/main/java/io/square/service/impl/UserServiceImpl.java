@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import io.square.common.ResponseResult;
+import io.square.controller.request.QueryMemberRequest;
 import io.square.entity.User;
 import io.square.mapper.UserMapper;
 import io.square.service.UserService;
@@ -11,6 +12,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -50,6 +52,21 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         selectById.setUpdateTime(LocalDate.now());
         baseMapper.updateById(selectById);
         return ResponseResult.success(selectById);
+    }
+
+    @Override
+    public ResponseResult<List<User>> getProjectMember(QueryMemberRequest request) {
+        return ResponseResult.success(baseMapper.selectList(null));
+    }
+
+    @Override
+    public Map<String, User> queryNameByIds(List<String> userIds) {
+        if (userIds.isEmpty()) {
+            return new HashMap<>(0);
+        }
+        LambdaQueryWrapper<User> wrapper = new LambdaQueryWrapper<>();
+        wrapper.in(User::getId, userIds);
+        return baseMapper.queryNameByIds(wrapper);
     }
 
 }
