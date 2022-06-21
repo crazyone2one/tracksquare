@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import lombok.extern.slf4j.Slf4j;
@@ -58,4 +59,17 @@ public class JacksonUtils {
         }
     }
 
+    /**
+     * json 字符串转json对象
+     *
+     * @param jsonString json 字符串转
+     * @return com.fasterxml.jackson.databind.JsonNode
+     */
+    public static JsonNode stringToJsonObject(String jsonString) {
+        try {
+            return OBJECT_MAPPER.readTree(jsonString);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }
