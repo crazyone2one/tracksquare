@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="io.square.mapper.TestPlanTestCaseMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="io.square.entity.TestPlanTestCase">
+        <id column="id" property="id" />
+        <result column="plan_id" property="planId" />
+        <result column="case_id" property="caseId" />
+        <result column="report_id" property="reportId" />
+        <result column="executor" property="executor" />
+        <result column="status" property="status" />
+        <result column="results" property="results" />
+        <result column="issues" property="issues" />
+        <result column="remark" property="remark" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+        <result column="actual_result" property="actualResult" />
+        <result column="create_user" property="createUser" />
+        <result column="issues_count" property="issuesCount" />
+        <result column="order" property="order" />
+    </resultMap>
+    <select id="testPlanTestCaseCount" resultType="io.square.dto.ParamsDTO">
+        select t.plan_id as id, COUNT(*) as value from test_plan_test_case t
+        <where>
+            t.is_del = 0
+            <if test="planIds != null and planIds.size() > 0">
+                and t.plan_id IN
+                <foreach collection="planIds" item="id" separator="," open="(" close=")">
+                    #{id}
+                </foreach>
+            </if>
+        </where>
+        GROUP BY t.plan_id
+    </select>
+
+</mapper>

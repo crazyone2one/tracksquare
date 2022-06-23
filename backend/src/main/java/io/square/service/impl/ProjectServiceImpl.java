@@ -83,6 +83,11 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
         return ResponseResult.success();
     }
 
+    @Override
+    public ResponseResult<List<Project>> getProjectList() {
+        return ResponseResult.success(baseMapper.selectList(null));
+    }
+
     public void addProjectVersion(Project project) {
         ProjectVersion projectVersion = ProjectVersion.builder().name("v1.0.0").projectId(project.getId())
                 .createTime(LocalDateTime.now()).startTime(LocalDateTime.now()).publishTime(LocalDateTime.now())

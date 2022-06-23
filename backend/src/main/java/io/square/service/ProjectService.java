@@ -26,4 +26,6 @@ public interface ProjectService extends IService<Project> {
     ResponseResult<Project> updateProject(Project project);
 
     ResponseResult<String> deleteProject(String projectId);
+
+    ResponseResult<List<Project>> getProjectList();
 }

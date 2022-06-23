@@ -4,11 +4,17 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import io.square.common.ResponseResult;
 import io.square.common.constants.TestCaseConstants;
+import io.square.controller.request.QueryNodeRequest;
+import io.square.controller.request.QueryTestCaseRequest;
+import io.square.entity.Project;
 import io.square.entity.TestCase;
 import io.square.entity.TestCaseNode;
+import io.square.entity.TestPlan;
 import io.square.exception.BizException;
+import io.square.mapper.ProjectMapper;
 import io.square.mapper.TestCaseMapper;
 import io.square.mapper.TestCaseNodeMapper;
+import io.square.mapper.TestPlanMapper;
 import io.square.service.TestCaseNodeService;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -32,13 +38,27 @@ import java.util.*;
 public class TestCaseNodeServiceImpl extends ServiceImpl<TestCaseNodeMapper, TestCaseNode> implements TestCaseNodeService {
     @Resource
     TestCaseMapper testCaseMapper;
+    @Resource
+    TestPlanMapper testPlanMapper;
+    @Resource
+    ProjectMapper projectMapper;
 
     @Override
     public ResponseResult<List<TestCaseNode>> getNodeTreeByProjectId(String projectId) {
+        QueryTestCaseRequest request = new QueryTestCaseRequest();
+        List<TestCaseNode> testCaseNodes = getNodeTreeByProjectId(projectId, request);
+        return ResponseResult.success(testCaseNodes);
+    }
+
+    private List<TestCaseNode> getNodeTreeByProjectId(String projectId, QueryTestCaseRequest request) {
         getDefaultNode(projectId);
         LambdaQueryWrapper<TestCaseNode> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(TestCaseNode::getProjectId, projectId).orderByAsc(TestCaseNode::getPos);
         List<TestCaseNode> testCaseNodes = baseMapper.selectList(wrapper);
+
+        request.setProjectId(projectId);
+
+
         List<String> allModuleIdList = new ArrayList<>();
         testCaseNodes.forEach(node -> {
             List<String> moduleIds = new ArrayList<>();
@@ -50,6 +70,7 @@ public class TestCaseNodeServiceImpl extends ServiceImpl<TestCaseNodeMapper, Tes
                 }
             }
         });
+        request.setModuleIds(allModuleIdList);
 
         LambdaQueryWrapper<TestCase> caseWrapper = new LambdaQueryWrapper<>();
         caseWrapper.eq(TestCase::getProjectId, projectId).in(TestCase::getNodeId, allModuleIdList).groupBy(TestCase::getNodeId);
@@ -67,9 +88,8 @@ public class TestCaseNodeServiceImpl extends ServiceImpl<TestCaseNodeMapper, Tes
             }
             node.setCaseNum(countNum);
         });
-                return ResponseResult.success(getNodeTrees(testCaseNodes));
+        return getNodeTrees(testCaseNodes);
     }
-
     private List<TestCaseNode> getNodeTrees(List<TestCaseNode> nodes) {
         List<TestCaseNode> nodeTreeList = new ArrayList<>();
         Map<Integer, List<TestCaseNode>> nodeLevelMap = new HashMap<>();
@@ -169,6 +189,80 @@ public class TestCaseNodeServiceImpl extends ServiceImpl<TestCaseNodeMapper, Tes
         // 删除模块数据
         int batchIds = baseMapper.deleteBatchIds(nodeIds);
         return ResponseResult.success(batchIds);
+    }
+
+    @Override
+    public ResponseResult<List<TestCaseNode>> getAllNodeByPlanId(QueryNodeRequest request) {
+        String planId = request.getTestPlanId();
+        TestPlan testPlan = testPlanMapper.selectById(planId);
+        if (Objects.isNull(testPlan)) {
+            return ResponseResult.success(new ArrayList<>());
+        }
+        return getAllNodeByProjectId(request);
+    }
+
+    @Override
+    public ResponseResult<List<TestCaseNode>> getAllNodeByProjectId(QueryNodeRequest request) {
+        return getNodeTreeByProjectId(request.getProjectId() );
+    }
+
+    @Override
+    public ResponseResult<List<TestCaseNode>> getNodeByPlanId(String planId) {
+        List<TestCase> testCases = testCaseMapper.getTestCaseWithNodeInfo(planId);
+        Map<String, List<String>> projectNodeMap = getProjectNodeMap(testCases);
+        List<TestCaseNode> list = getNodeTreeWithPruningTree(projectNodeMap);
+        return ResponseResult.success(list);
+    }
+
+    private List<TestCaseNode> getNodeTreeWithPruningTree(Map<String, List<String>> projectNodeMap) {
+        List<TestCaseNode> list = new ArrayList<>();
+        projectNodeMap.forEach((k,v)->{
+            Project project = projectMapper.selectById(k);
+            if (Objects.nonNull(project)) {
+                String name = project.getName();
+                List<TestCaseNode> testCaseNodes = getNodeTreeWithPruningTree(k, v);
+                TestCaseNode testCaseNode = new TestCaseNode();
+                testCaseNode.setProjectId(project.getId());
+                testCaseNode.setName(name);
+                testCaseNode.setLabel(name);
+                testCaseNode.setChildren(testCaseNodes);
+                if (CollectionUtils.isNotEmpty(testCaseNodes)) {
+                    list.add(testCaseNode);
+                }
+            }
+        });
+        return list;
+    }
+
+    private List<TestCaseNode> getNodeTreeWithPruningTree(String projectId, List<String> pruningTreeIds) {
+        List<TestCaseNode> testCaseNodes = baseMapper.getNodeTreeByProjectId(projectId);
+        List<TestCaseNode> nodeTrees= getNodeTrees(testCaseNodes);
+        nodeTrees.removeIf(rootNode -> pruningTree(rootNode, pruningTreeIds));
+        return nodeTrees;
+    }
+
+    private boolean pruningTree(TestCaseNode rootNode, List<String> nodeIds) {
+        List<TestCaseNode> children = rootNode.getChildren();
+        if (Objects.isNull(children) || children.isEmpty()) {
+            if (!nodeIds.contains(rootNode.getId())) {
+                return true;
+            }
+        }
+        if (Objects.nonNull(children)) {
+            children.removeIf(next -> pruningTree(next, nodeIds));
+            return children.isEmpty() && !nodeIds.contains(rootNode.getId());
+        }
+        return false;
+    }
+
+    private Map<String, List<String>> getProjectNodeMap(List<TestCase> testCases) {
+        Map<String, List<String>> projectNodeMap = new HashMap<>();
+        for (TestCase testCase : testCases) {
+            List<String> nodeIds = Optional.ofNullable(projectNodeMap.get(testCase.getProjectId())).orElse(new ArrayList<>());
+            nodeIds.add(testCase.getNodeId());
+            projectNodeMap.put(testCase.getProjectId(), nodeIds);
+        }
+        return projectNodeMap;
     }
 
     private List<String> selectCaseIdByNodeIds(List<String> nodeIds) {

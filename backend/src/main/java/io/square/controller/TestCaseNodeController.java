@@ -1,6 +1,7 @@
 package io.square.controller;
 
 import io.square.common.ResponseResult;
+import io.square.controller.request.QueryNodeRequest;
 import io.square.entity.TestCaseNode;
 import io.square.service.TestCaseNodeService;
 import org.springframework.web.bind.annotation.*;
@@ -27,6 +28,11 @@ public class TestCaseNodeController {
         return service.getNodeTreeByProjectId(projectId);
     }
 
+    @PostMapping("/list/all/plan")
+    public ResponseResult<List<TestCaseNode>> getAllNodeByPlanId(@RequestBody QueryNodeRequest request) {
+        return service.getAllNodeByPlanId(request);
+    }
+
     @PostMapping("/add")
     public ResponseResult<String> addNode(@RequestBody TestCaseNode node) {
         return service.addNode(node);
@@ -40,5 +46,10 @@ public class TestCaseNodeController {
     @PostMapping("/delete")
     public ResponseResult<Integer> deleteNode(@RequestBody List<String> nodeIds) {
         return service.deleteNode(nodeIds);
+    }
+
+    @GetMapping("/list/plan/{planId}")
+    public ResponseResult<List<TestCaseNode>> getNodeByPlanId(@PathVariable String planId) {
+        return service.getNodeByPlanId(planId);
     }
 }

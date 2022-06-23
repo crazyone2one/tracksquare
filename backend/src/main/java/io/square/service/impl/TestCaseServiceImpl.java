@@ -20,6 +20,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import java.util.*;
@@ -49,7 +50,9 @@ public class TestCaseServiceImpl extends ServiceImpl<TestCaseMapper, TestCase> i
     @Override
     public ResponseResult<Map<String, Object>> listTestCase(QueryTestCaseRequest request, long page, long limit) {
         //initRequest(request, true);
-        IPage<TestCase> iPage = baseMapper.selectPage(new Page<>(page, limit), null);
+        LambdaQueryWrapper<TestCase> wrapper = new LambdaQueryWrapper<>();
+        wrapper.like(StringUtils.isNotBlank(request.getName()),TestCase::getName, request.getName());
+        IPage<TestCase> iPage = baseMapper.selectPage(new Page<>(page, limit), wrapper);
         buildUserInfo(iPage.getRecords());
         buildProjectInfoWithoutProject(iPage.getRecords());
         Map<String, Object> result = new LinkedHashMap<>();
@@ -85,7 +88,7 @@ public class TestCaseServiceImpl extends ServiceImpl<TestCaseMapper, TestCase> i
 
     @Override
     public ResponseResult<TestCase> addTestCase(TestCase request) {
-        request.setId(UUID.randomUUID().toString());
+        request.setId(request.getId());
         checkTestCaseExist(request);
         //checkTestCustomNum(request);
         request.setNum(getNextNum(request.getProjectId()));
@@ -108,6 +111,35 @@ public class TestCaseServiceImpl extends ServiceImpl<TestCaseMapper, TestCase> i
         baseMapper.insert(request);
         saveFollows(request.getId(), request.getFollows());
         return ResponseResult.success(request);
+    }
+
+    @Override
+    public ResponseResult<TestCase> getTestCase(String testCaseId) {
+        TestCase testCase = baseMapper.selectById(testCaseId);
+        testCase.setProjectName(projectMapper.selectById(testCase.getProjectId()).getName());
+        return ResponseResult.success(testCase);
+    }
+
+    @Override
+    public ResponseResult<TestCase> saveCase(TestCase request, List<MultipartFile> fileList) {
+        return addTestCase(request);
+    }
+
+    @Override
+    public ResponseResult<TestCase> saveCase(TestCase request) {
+        baseMapper.updateById(request);
+        return ResponseResult.success(request);
+    }
+
+    @Override
+    public ResponseResult<Map<String, Object>> getTestCaseRelateList(long page, long limit, QueryTestCaseRequest request) {
+        LambdaQueryWrapper<TestCase> wrapper = new LambdaQueryWrapper<>();
+        wrapper.notInSql(TestCase::getId, "select case_id from test_plan_test_case where plan_id ='" + request.getPlanId() + "'");
+        IPage<TestCase> iPage = baseMapper.getTestCaseByNotInPlan(new Page<>(page, limit), wrapper);
+        Map<String, Object> result = new LinkedHashMap<>();
+        result.put("total", iPage.getTotal());
+        result.put("records", iPage.getRecords());
+        return ResponseResult.success(result);
     }
 
     private void saveFollows(String caseId, List<String> follows) {

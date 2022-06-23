@@ -2,6 +2,7 @@ package io.square.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import io.square.common.ResponseResult;
+import io.square.controller.request.QueryNodeRequest;
 import io.square.entity.TestCaseNode;
 
 import java.util.List;
@@ -37,4 +38,16 @@ public interface TestCaseNodeService extends IService<TestCaseNode> {
     ResponseResult<TestCaseNode> editNode(TestCaseNode node);
 
     ResponseResult<Integer> deleteNode(List<String> nodeIds);
+
+    ResponseResult<List<TestCaseNode>> getAllNodeByPlanId(QueryNodeRequest request);
+
+    ResponseResult<List<TestCaseNode>> getAllNodeByProjectId(QueryNodeRequest request);
+
+    /**
+     * 根据plan id 查询对应的node信息
+     *
+     * @param planId plan id
+     * @return io.square.common.ResponseResult<java.util.List < io.square.entity.TestCaseNode>>
+     */
+    ResponseResult<List<TestCaseNode>> getNodeByPlanId(String planId);
 }

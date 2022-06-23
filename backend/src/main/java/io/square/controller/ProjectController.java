@@ -47,4 +47,9 @@ public class ProjectController {
     public ResponseResult<String> deleteProject(@PathVariable String projectId) {
         return service.deleteProject(projectId);
     }
+
+    @GetMapping("/listAll")
+    public ResponseResult<List<Project>> listAll() {
+        return service.getProjectList();
+    }
 }

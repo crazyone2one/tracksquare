@@ -1,9 +1,10 @@
 package io.square.mapper;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Constants;
 import io.square.entity.TestCase;
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
@@ -34,4 +35,16 @@ public interface TestCaseMapper extends BaseMapper<TestCase> {
     TestCase getMaxNumByProjectId(@Param(Constants.WRAPPER) LambdaQueryWrapper<TestCase> wrapper);
 
     Long getLastOrder(@Param("projectId") String projectId, @Param("baseOrder") Long baseOrder);
+
+    @Select("select * from test_case ${ew.customSqlSegment}")
+    IPage<TestCase> getTestCaseByNotInPlan(IPage<?> page, @Param(Constants.WRAPPER) LambdaQueryWrapper<TestCase> wrapper);
+
+    /**
+     * 根据plan id查询对应测试用例的项目、模块信息
+     *
+     * @param planId plan id
+     * @return java.util.List<io.square.entity.TestCase>
+     */
+    @Select("select tc.project_id, tc.node_id from test_plan_test_case tptc join test_case tc on tptc.case_id = tc.id where tptc.plan_id = #{planId}")
+    List<TestCase> getTestCaseWithNodeInfo(@Param("planId") String planId);
 }

@@ -3,6 +3,10 @@ package io.square.mapper;
 import io.square.entity.TestCaseNode;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
+
+import java.util.List;
 
 /**
  * <p>
@@ -15,4 +19,6 @@ import org.apache.ibatis.annotations.Mapper;
 @Mapper
 public interface TestCaseNodeMapper extends BaseMapper<TestCaseNode> {
 
+    @Select("select * from test_case_node where test_case_node.project_id = #{projectId} order by pos asc")
+    List<TestCaseNode> getNodeTreeByProjectId(@Param("projectId") String projectId);
 }

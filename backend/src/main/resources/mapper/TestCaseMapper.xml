@@ -49,5 +49,13 @@
         </if>
         order by `order` desc limit 1;
     </select>
+<!--    <select id="getTestCaseByNotInPlan" resultType="io.square.entity.TestCase">-->
+<!--        select test_case.id, test_case.name, test_case.priority, test_case.type, test_case.review_status,-->
+<!--               test_case.num, test_case.custom_num, test_case.priority, test_case.tags, test_case.create_time,-->
+<!--               test_case.update_time,-->
+<!--             test_case.version_id versionId from test_case where test_case.id not in (select case_id from test_plan_test_case where plan_id =#{planId})-->
+<!--&#45;&#45;             left join test_plan_test_case as T2 on test_case.id=T2.case_id and T2.plan_id =#{planId}-->
+<!--&#45;&#45;             and T2.case_id is null-->
+<!--    </select>-->
 
 </mapper>

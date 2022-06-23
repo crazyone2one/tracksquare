@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="io.square.mapper.CustomFieldMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="io.square.entity.CustomField">
+        <id column="id" property="id" />
+        <result column="name" property="name" />
+        <result column="scene" property="scene" />
+        <result column="type" property="type" />
+        <result column="remark" property="remark" />
+        <result column="options" property="options" />
+        <result column="system" property="system" />
+        <result column="global" property="global" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+        <result column="create_user" property="createUser" />
+        <result column="project_id" property="projectId" />
+    </resultMap>
+
+</mapper>

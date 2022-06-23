@@ -4,7 +4,9 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import io.square.common.ResponseResult;
 import io.square.controller.request.QueryTestCaseRequest;
 import io.square.entity.TestCase;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -30,4 +32,11 @@ public interface TestCaseService extends IService<TestCase> {
     ResponseResult<Map<String, Object>> listTestCase(QueryTestCaseRequest request, long page, long limit);
 
     ResponseResult<TestCase> addTestCase(TestCase request);
+
+    ResponseResult<TestCase> getTestCase(String testCaseId);
+
+    ResponseResult<TestCase> saveCase(TestCase request, List<MultipartFile> fileList);
+    ResponseResult<TestCase> saveCase(TestCase request);
+
+    ResponseResult<Map<String, Object>> getTestCaseRelateList(long page, long limit, QueryTestCaseRequest request);
 }
