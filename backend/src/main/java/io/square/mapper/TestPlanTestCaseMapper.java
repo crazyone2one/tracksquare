@@ -1,8 +1,12 @@
 package io.square.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import io.square.controller.request.QueryTestPlanCaseRequest;
 import io.square.dto.CountMapDTO;
 import io.square.dto.ParamsDTO;
+import io.square.dto.TestPlanCaseDTO;
 import io.square.entity.TestPlanTestCase;
 import org.apache.ibatis.annotations.MapKey;
 import org.apache.ibatis.annotations.Mapper;
@@ -35,4 +39,6 @@ public interface TestPlanTestCaseMapper extends BaseMapper<TestPlanTestCase> {
 
     @Select("select `status` from test_plan_test_case where plan_id = #{planId}")
     List<String> getStatusByPlanId(String planId);
+
+    IPage<TestPlanCaseDTO> list(@Param("request") QueryTestPlanCaseRequest request, @Param("objectPage") Page<Object> objectPage);
 }
