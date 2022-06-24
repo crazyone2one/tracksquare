@@ -28,4 +28,8 @@ public interface ProjectService extends IService<Project> {
     ResponseResult<String> deleteProject(String projectId);
 
     ResponseResult<List<Project>> getProjectList();
+
+    Map<String, Project> getProjectMap(List<String> ids);
+
+    Map<String, String> getProjectNameMap(List<String> ids);
 }

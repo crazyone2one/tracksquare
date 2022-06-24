@@ -11,12 +11,14 @@ import io.square.exception.BizException;
 import io.square.mapper.ProjectMapper;
 import io.square.mapper.ProjectVersionMapper;
 import io.square.service.ProjectService;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -86,6 +88,24 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
     @Override
     public ResponseResult<List<Project>> getProjectList() {
         return ResponseResult.success(baseMapper.selectList(null));
+    }
+
+    @Override
+    public Map<String, Project> getProjectMap(List<String> ids) {
+        if (CollectionUtils.isNotEmpty(ids)) {
+            return baseMapper.queryNameByIds(ids);
+        }
+        return new HashMap<>();
+    }
+
+    @Override
+    public Map<String, String> getProjectNameMap(List<String> ids) {
+        Map<String, Project> projectMap = getProjectMap(ids);
+        HashMap<String, String> nameMap = new HashMap<>();
+        projectMap.forEach((k, v) -> {
+            nameMap.put(k, v.getName());
+        });
+        return nameMap;
     }
 
     public void addProjectVersion(Project project) {
