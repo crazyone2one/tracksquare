@@ -39,4 +39,6 @@ public interface TestCaseService extends IService<TestCase> {
     ResponseResult<TestCase> saveCase(TestCase request);
 
     ResponseResult<Map<String, Object>> getTestCaseRelateList(long page, long limit, QueryTestCaseRequest request);
+
+    void deleteTestCaseByProjectId(String projectId);
 }

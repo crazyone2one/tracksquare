@@ -1,5 +1,6 @@
 package io.square.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import io.square.entity.TestPlanPrincipal;
 import io.square.mapper.TestPlanPrincipalMapper;
 import io.square.service.TestPlanPrincipalService;
@@ -17,4 +18,15 @@ import org.springframework.stereotype.Service;
 @Service
 public class TestPlanPrincipalServiceImpl extends ServiceImpl<TestPlanPrincipalMapper, TestPlanPrincipal> implements TestPlanPrincipalService {
 
+    @Override
+    public void deleteTestPlanPrincipalByPlanId(String planId) {
+        LambdaQueryWrapper<TestPlanPrincipal> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(TestPlanPrincipal::getTestPlanId, planId);
+        baseMapper.delete(wrapper);
+    }
+
+    @Override
+    public int insertTestPlanPrincipal(TestPlanPrincipal planPrincipal) {
+        return baseMapper.insert(planPrincipal);
+    }
 }

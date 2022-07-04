@@ -38,4 +38,19 @@ public class UserController {
     public ResponseResult<List<User>> getProjectMember(@RequestBody QueryMemberRequest request) {
         return userService.getProjectMember(request);
     }
+
+    @PostMapping("/special/ws/member/list/all")
+    public ResponseResult<List<User>> getMemberListByAdmin(@RequestBody User user) {
+        return userService.getMemberList(user);
+    }
+
+    @GetMapping("/list")
+    public ResponseResult<List<User>> getUserList() {
+        return userService.getUserList();
+    }
+
+    @PostMapping("/switch/source/ws/{sourceId}/{userId}")
+    public ResponseResult<User> switchWorkspace(@PathVariable String sourceId, @PathVariable String userId) {
+        return userService.switchUserResource(sourceId, userId, "workspace");
+    }
 }

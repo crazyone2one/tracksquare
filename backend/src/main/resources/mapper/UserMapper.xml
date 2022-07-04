@@ -22,5 +22,14 @@
         <result column="selenium_server" property="seleniumServer" />
         <result column="token" property="token" />
     </resultMap>
+    <select id="getMemberList" resultType="io.square.entity.User">
+        SELECT DISTINCT * FROM (
+        SELECT `user`.* FROM user_group JOIN `user` ON user_group.user_id = `user`.id
+        WHERE user_group.source_id = #{member.workspaceId}
+        <if test="member.name != null">
+            AND `user`.name like CONCAT('%', #{member.name},'%')
+        </if>
+        order by user_group.update_time desc) temp
+    </select>
 
 </mapper>

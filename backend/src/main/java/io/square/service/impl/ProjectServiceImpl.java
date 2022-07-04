@@ -5,12 +5,18 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import io.square.common.ResponseResult;
+import io.square.common.constants.UserGroupConstants;
 import io.square.entity.Project;
 import io.square.entity.ProjectVersion;
+import io.square.entity.UserGroup;
 import io.square.exception.BizException;
 import io.square.mapper.ProjectMapper;
 import io.square.mapper.ProjectVersionMapper;
+import io.square.mapper.UserGroupMapper;
+import io.square.mapper.UserMapper;
 import io.square.service.ProjectService;
+import io.square.service.TestCaseService;
+import io.square.service.TestPlanService;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -25,7 +31,7 @@ import java.util.Map;
 
 /**
  * <p>
- *  服务实现类
+ * 服务实现类
  * </p>
  *
  * @author 11's papa
@@ -35,6 +41,15 @@ import java.util.Map;
 public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> implements ProjectService {
     @Resource
     ProjectVersionMapper projectVersionMapper;
+    @Resource
+    UserGroupMapper userGroupMapper;
+    @Resource
+    UserMapper userMapper;
+    @Resource
+    TestPlanService testPlanService;
+    @Resource
+    TestCaseService testCaseService;
+
     @Override
     public ResponseResult<Map<String, Object>> getProjectList(Project project, long page, long limit) {
         LambdaQueryWrapper<Project> wrapper = new LambdaQueryWrapper<>();
@@ -59,15 +74,19 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
             BizException.throwException("项目名称为空");
         }
         LambdaQueryWrapper<Project> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(Project::getName, project.getName());
+        wrapper.eq(Project::getName, project.getName()).eq(Project::getWorkspaceId, project.getWorkspaceId());
         if (baseMapper.selectCount(wrapper) > 0) {
             BizException.throwException("项目名称已存在");
         }
-        Project build = Project.builder().name(project.getName()).description(project.getDescription()).createUser(project.getCreateUser())
-                .createTime(LocalDate.now()).updateTime(LocalDate.now()).systemId(genSystemId()).build();
-        baseMapper.insert(build);
-        addProjectVersion(build);
-        return ResponseResult.success(build);
+        project.setSystemId(genSystemId());
+        baseMapper.insert(project);
+        // 创建项目为当前用户添加用户组
+        UserGroup build = UserGroup.builder().groupId(UserGroupConstants.PROJECT_ADMIN).userId(project.getCreateUser()).sourceId(project.getId()).build();
+        userGroupMapper.insert(build);
+        // 创建新项目检查当前用户 last_project_id
+        userMapper.updateLastProjectIdIfNull(project.getId(), project.getCreateUser());
+        addProjectVersion(project);
+        return ResponseResult.success(project);
     }
 
     @Override
@@ -81,8 +100,22 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
     @Override
     public ResponseResult<String> deleteProject(String projectId) {
         // TODO: 2022/6/14 0014 删除项目下相关的数据资源
+        // 删除项目下 测试跟踪 相关
+        deleteTrackResourceByProjectId(projectId);
         baseMapper.deleteById(projectId);
         return ResponseResult.success();
+    }
+
+    private void deleteTrackResourceByProjectId(String projectId) {
+        // 删除相关测试计划
+        List<String> testPlanIds = testPlanService.getPlanIdByProjectId(projectId);
+        if (CollectionUtils.isNotEmpty(testPlanIds)) {
+            testPlanIds.forEach(testPlanId -> {
+                testPlanService.deleteTestPlan(testPlanId);
+            });
+        }
+        // 删除测试用例
+        testCaseService.deleteTestCaseByProjectId(projectId);
     }
 
     @Override
@@ -135,7 +168,7 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
     private void checkProjectExist(Project project) {
         if (StringUtils.isNotBlank(project.getName())) {
             LambdaQueryWrapper<Project> wrapper = new LambdaQueryWrapper<>();
-            wrapper.eq(Project::getName, project.getName()).ne(Project::getId,project.getId());
+            wrapper.eq(Project::getName, project.getName()).ne(Project::getId, project.getId());
             if (baseMapper.selectCount(wrapper) > 0) {
                 BizException.throwException("项目名称已存在");
             }

@@ -55,7 +55,7 @@ public class BaseQueryRequest {
     /**
      * 排序条件
      */
-    //private List<OrderRequest> orders;
+    private List<OrderRequest> orders;
 
     /**
      * 过滤条件

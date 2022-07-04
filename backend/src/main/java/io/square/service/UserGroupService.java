@@ -1,7 +1,12 @@
 package io.square.service;
 
+import io.square.common.ResponseResult;
+import io.square.entity.Group;
 import io.square.entity.UserGroup;
 import com.baomidou.mybatisplus.extension.service.IService;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -13,4 +18,9 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface UserGroupService extends IService<UserGroup> {
 
+    ResponseResult<List<UserGroup>> getWorkspaceMemberGroups(String workspaceId, String userId);
+
+    ResponseResult<Map<String, Object>> getGroupUser(Group group, long page, long limit);
+
+    ResponseResult<List<?>> getGroupSource(String groupId, String userId);
 }

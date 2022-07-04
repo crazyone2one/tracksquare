@@ -70,4 +70,8 @@ public interface TestPlanService extends IService<TestPlan> {
     ResponseResult<String> testPlanRelevance(PlanCaseRelevanceRequest request);
 
     ResponseResult<String> editTestPlanStatus(String planId);
+
+    List<String> getPlanIdByProjectId(String projectId);
+
+    int deleteTestPlan(String planId);
 }

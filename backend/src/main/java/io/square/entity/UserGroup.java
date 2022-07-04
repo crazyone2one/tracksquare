@@ -1,13 +1,15 @@
 package io.square.entity;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
-import java.io.Serializable;
-import java.time.LocalDateTime;
-
+import com.baomidou.mybatisplus.annotation.*;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import lombok.*;
+
+import java.io.Serializable;
+import java.time.LocalDate;
 
 /**
  * <p>
@@ -39,11 +41,23 @@ public class UserGroup implements Serializable {
     @TableField("source_id")
     private String sourceId;
 
-    @TableField("create_time")
-    private LocalDateTime createTime;
+    @TableField(value = "create_time",fill = FieldFill.INSERT)
+    @JsonSerialize(using = LocalDateSerializer.class)
+    @JsonDeserialize(using = LocalDateDeserializer.class)
+    @JsonFormat(shape = JsonFormat.Shape.STRING , pattern = "yyyy-MM-dd", timezone = "Asia/Shanghai")
+    private LocalDate createTime;
 
-    @TableField("update_time")
-    private LocalDateTime updateTime;
+    @TableField(value = "update_time",fill = FieldFill.INSERT_UPDATE)
+    @JsonSerialize(using = LocalDateSerializer.class)
+    @JsonDeserialize(using = LocalDateDeserializer.class)
+    @JsonFormat(shape = JsonFormat.Shape.STRING , pattern = "yyyy-MM-dd", timezone = "Asia/Shanghai")
+    private LocalDate updateTime;
 
-
+    @TableField(exist = false)
+    private String name;
+    /**
+     * 用户组所属类型
+     */
+    @TableField(exist = false)
+    private String type;
 }

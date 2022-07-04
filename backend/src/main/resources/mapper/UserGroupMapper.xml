@@ -11,5 +11,26 @@
         <result column="create_time" property="createTime" />
         <result column="update_time" property="updateTime" />
     </resultMap>
+    <select id="getGroupUser" resultType="io.square.entity.User">
+        select distinct user.id, user.name, user.email, user.phone, user.create_time
+        from user join user_group ug on user.id = ug.user_id
+        where ug.group_id = #{request.userGroupId}
+        <if test="request.name != null and request.name !=''">
+            and user.name like concat('%', #{request.name},'%')
+        </if>
+        order by ug.update_time desc
+    </select>
+    <select id="getRelatedSource" resultType="io.square.dto.RelatedSource">
+        SELECT workspace_id, project.id
+        FROM user_group
+                 JOIN project ON source_id = project.id
+                 JOIN workspace w ON project.workspace_id = w.id
+        WHERE user_id = #{userId} -- project_admin project_member read_only bb
+        UNION
+        SELECT  w.id, ''
+        FROM user_group
+                 JOIN workspace w ON user_group.source_id = w.id
+        WHERE user_id = #{userId} -- workspace_admin workspace_member ccc
+    </select>
 
 </mapper>

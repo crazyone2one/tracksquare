@@ -15,6 +15,8 @@ import io.square.dto.ParamsDTO;
 import io.square.entity.*;
 import io.square.exception.BizException;
 import io.square.mapper.*;
+import io.square.service.TestPlanFollowService;
+import io.square.service.TestPlanPrincipalService;
 import io.square.service.TestPlanService;
 import io.square.utils.CommonUtils;
 import io.square.utils.JacksonUtils;
@@ -48,9 +50,9 @@ public class TestPlanServiceImpl extends ServiceImpl<TestPlanMapper, TestPlan> i
     @Resource
     SessionUtils sessionUtils;
     @Resource
-    TestPlanPrincipalMapper principalMapper;
+    TestPlanPrincipalService testPlanPrincipalService;
     @Resource
-    TestPlanFollowMapper followMapper;
+    TestPlanFollowService testPlanFollowService;
     @Resource
     TestPlanTestCaseMapper testPlanTestCaseMapper;
     @Resource
@@ -95,7 +97,7 @@ public class TestPlanServiceImpl extends ServiceImpl<TestPlanMapper, TestPlan> i
                 TestPlanPrincipal planPrincipal = new TestPlanPrincipal();
                 planPrincipal.setPrincipalId(p);
                 planPrincipal.setTestPlanId(planId);
-                principalMapper.insert(planPrincipal);
+                testPlanPrincipalService.insertTestPlanPrincipal(planPrincipal);
             });
         }
         List<String> follows = testPlan.getFollows();
@@ -104,7 +106,7 @@ public class TestPlanServiceImpl extends ServiceImpl<TestPlanMapper, TestPlan> i
                 TestPlanFollow follow = new TestPlanFollow();
                 follow.setFollowId(f);
                 follow.setTestPlanId(planId);
-                followMapper.insert(follow);
+                testPlanFollowService.insertTestPlanFollow(follow);
             });
         }
         testPlan.setWorkspaceId("");
@@ -221,6 +223,32 @@ public class TestPlanServiceImpl extends ServiceImpl<TestPlanMapper, TestPlan> i
         baseMapper.updateById(testPlan);
         return ResponseResult.success();
     }
+
+    @Override
+    public List<String> getPlanIdByProjectId(String projectId) {
+        LambdaQueryWrapper<TestPlan> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(TestPlan::getProjectId, projectId);
+        List<TestPlan> testPlans = baseMapper.selectList(wrapper);
+        if (CollectionUtils.isEmpty(testPlans)) {
+            return new ArrayList<>();
+        }
+        return testPlans.stream().map(TestPlan::getId).collect(Collectors.toList());
+    }
+
+    @Override
+    public int deleteTestPlan(String planId) {
+        testPlanPrincipalService.deleteTestPlanPrincipalByPlanId(planId);
+        testPlanFollowService.deleteTestPlanFollowByPlanId(planId);
+        deleteTestCaseByPlanId(planId);
+        return baseMapper.deleteById(planId);
+    }
+
+    private void deleteTestCaseByPlanId(String planId) {
+        LambdaQueryWrapper<TestPlanTestCase> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(TestPlanTestCase::getPlanId, planId);
+        testPlanTestCaseMapper.delete(wrapper);
+    }
+
     private String calcTestPlanStatus(String planId) {
         // test-plan-functional-case status
         List<String> funcStatusList = testPlanTestCaseMapper.getStatusByPlanId(planId);

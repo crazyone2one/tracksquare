@@ -30,4 +30,14 @@ public class SessionUtils {
         User byUsername = userMapper.findByUsername(request.getUserPrincipal().getName());
         return byUsername.getLastProjectId();
     }
+
+    public  String getCurrentWorkspaceId() {
+        HttpServletRequest request = ((ServletRequestAttributes) (RequestContextHolder.currentRequestAttributes())).getRequest();
+        log.info("PROJECT: {}",request.getHeader("workspace"));
+        if (request.getHeader("workspace") != null) {
+            return request.getHeader("workspace");
+        }
+        User byUsername = userMapper.findByUsername(request.getUserPrincipal().getName());
+        return byUsername.getLastWorkspaceId();
+    }
 }

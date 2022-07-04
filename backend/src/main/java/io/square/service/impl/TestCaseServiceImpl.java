@@ -52,6 +52,7 @@ public class TestCaseServiceImpl extends ServiceImpl<TestCaseMapper, TestCase> i
         //initRequest(request, true);
         LambdaQueryWrapper<TestCase> wrapper = new LambdaQueryWrapper<>();
         wrapper.like(StringUtils.isNotBlank(request.getName()),TestCase::getName, request.getName());
+        wrapper.in(CollectionUtils.isNotEmpty(request.getNodeIds()), TestCase::getNodeId, request.getNodeIds());
         IPage<TestCase> iPage = baseMapper.selectPage(new Page<>(page, limit), wrapper);
         buildUserInfo(iPage.getRecords());
         buildProjectInfoWithoutProject(iPage.getRecords());
@@ -140,6 +141,13 @@ public class TestCaseServiceImpl extends ServiceImpl<TestCaseMapper, TestCase> i
         result.put("total", iPage.getTotal());
         result.put("records", iPage.getRecords());
         return ResponseResult.success(result);
+    }
+
+    @Override
+    public void deleteTestCaseByProjectId(String projectId) {
+        LambdaQueryWrapper<TestCase> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(TestCase::getProjectId, projectId);
+        baseMapper.delete(wrapper);
     }
 
     private void saveFollows(String caseId, List<String> follows) {

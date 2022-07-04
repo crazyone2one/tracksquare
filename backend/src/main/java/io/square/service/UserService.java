@@ -27,4 +27,10 @@ public interface UserService extends IService<User> {
     ResponseResult<List<User>> getProjectMember(QueryMemberRequest request);
 
     Map<String, User> queryNameByIds(List<String> userIds);
+
+    ResponseResult<List<User>> getMemberList(User user);
+
+    ResponseResult<List<User>> getUserList();
+
+    ResponseResult<User> switchUserResource(String sourceId, String userId, String workspace);
 }

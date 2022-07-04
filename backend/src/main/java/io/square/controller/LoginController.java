@@ -55,7 +55,7 @@ public class LoginController {
         return ResponseResult.success(result);
     }
 
-    @GetMapping("/user/list")
+    @GetMapping("/user/register")
     public ResponseResult<List<User>> register() {
         List<User> usersList = userService.getUsersList();
         return ResponseResult.success(usersList);

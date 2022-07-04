@@ -13,4 +13,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface TestPlanFollowService extends IService<TestPlanFollow> {
 
+    int insertTestPlanFollow(TestPlanFollow testPlanFollow);
+
+    void deleteTestPlanFollowByPlanId(String planId);
 }
