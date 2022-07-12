@@ -4,6 +4,8 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Constants;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import io.square.controller.request.QueryMemberRequest;
 import io.square.entity.User;
 import org.apache.ibatis.annotations.*;
 
@@ -42,6 +44,10 @@ public interface UserMapper extends BaseMapper<User> {
     void updateLastWorkspaceIdIfNull(@Param("workspaceId") String workspaceId, @Param("userId") String userId);
 
     List<User> getMemberList(@Param("member") User user);
+
+    IPage<User> getMemberList(Page<User> page, @Param("member") QueryMemberRequest request);
+    @Select("SELECT DISTINCT * FROM ( SELECT `user`.* FROM user_group JOIN `user` ON user_group.user_id = `user`.id WHERE user_group.source_id = #{request.projectId} order by `user`.update_time desc) temp")
+    IPage<User> getProjectMemberList(Page<User> page, @Param("member") QueryMemberRequest request);
 
     @Update("update user set last_project_id = #{projectId} where id = #{userId} and (last_project_id is null or last_project_id = '')")
     void updateLastProjectIdIfNull(@Param("projectId") String projectId, @Param("userId") String userId);

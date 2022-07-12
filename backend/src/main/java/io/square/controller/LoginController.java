@@ -50,7 +50,7 @@ public class LoginController {
         User byUsername = userMapper.findByUsername(jwtRequest.getUserName());
         String token = jwtTokenUtils.generateToken(jwtRequest.getUserName(), false);
         Map<String, Object> result = new LinkedHashMap<>();
-        result.put("token", token);
+        result.put("access_token", token);
         result.put("user", byUsername);
         return ResponseResult.success(result);
     }

@@ -13,6 +13,9 @@ import lombok.*;
 
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -68,7 +71,7 @@ public class User implements Serializable {
     @TableField("create_time")
     @JsonSerialize(using = LocalDateSerializer.class)
     @JsonDeserialize(using = LocalDateDeserializer.class)
-    @JsonFormat(shape = JsonFormat.Shape.STRING , pattern = "yyyy-MM-dd", timezone = "Asia/Shanghai")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "Asia/Shanghai")
     private LocalDate createTime;
 
     /**
@@ -77,7 +80,7 @@ public class User implements Serializable {
     @TableField("update_time")
     @JsonSerialize(using = LocalDateSerializer.class)
     @JsonDeserialize(using = LocalDateDeserializer.class)
-    @JsonFormat(shape = JsonFormat.Shape.STRING , pattern = "yyyy-MM-dd", timezone = "Asia/Shanghai")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "Asia/Shanghai")
     private LocalDate updateTime;
 
     @TableField("language")
@@ -102,7 +105,7 @@ public class User implements Serializable {
     private String createUser;
 
     /**
-     *  其他平台对接信息
+     * 其他平台对接信息
      */
     @TableField("platform_info")
     private String platformInfo;
@@ -113,8 +116,10 @@ public class User implements Serializable {
     @TableField("token")
     private String token;
 
-   @TableField(exist = false)
+    @TableField(exist = false)
     private String workspaceId;
     @TableField(exist = false)
     private String projectId;
+    @TableField(exist = false)
+    private List<Map<String, Object>> groups = new ArrayList<>();
 }

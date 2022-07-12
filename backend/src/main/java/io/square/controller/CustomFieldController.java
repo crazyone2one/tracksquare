@@ -7,6 +7,7 @@ import io.square.service.CustomFieldService;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -32,5 +33,20 @@ public class CustomFieldController {
     @PostMapping("/list/{page}/{limit}")
     public ResponseResult<Map<String, Object>> listPage(@RequestBody QueryCustomFieldRequest request, @PathVariable Long limit, @PathVariable Long page) {
         return service.listPageData(request, page, limit);
+    }
+
+    @PostMapping("/list/relate/{page}/{limit}")
+    public ResponseResult<Map<String, Object>> listRelate(@RequestBody QueryCustomFieldRequest request, @PathVariable Long limit, @PathVariable Long page) {
+        return service.listRelate(request, page, limit);
+    }
+
+    @PostMapping("/list")
+    public ResponseResult<List<CustomField>> getList(@RequestBody QueryCustomFieldRequest request) {
+        return service.list(request);
+    }
+
+    @PostMapping("/default")
+    public ResponseResult<List<CustomField>> getDefaultList(@RequestBody QueryCustomFieldRequest request) {
+        return service.getDefaultField(request);
     }
 }

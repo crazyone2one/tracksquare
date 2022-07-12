@@ -1,5 +1,6 @@
 package io.square.service;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import io.square.common.ResponseResult;
 import io.square.entity.Project;
 import com.baomidou.mybatisplus.extension.service.IService;
@@ -32,4 +33,8 @@ public interface ProjectService extends IService<Project> {
     Map<String, Project> getProjectMap(List<String> ids);
 
     Map<String, String> getProjectNameMap(List<String> ids);
+
+    void deleteByWorkspace(String workspaceId);
+
+    List<Project> getProjectByWrapper(LambdaQueryWrapper<Project> wrapper);
 }

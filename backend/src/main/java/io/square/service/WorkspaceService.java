@@ -29,4 +29,6 @@ public interface WorkspaceService extends IService<Workspace> {
     ResponseResult<WorkspaceResource> listResource(String groupId, String type);
 
     ResponseResult<List<Workspace>> getWorkspaceListByUserId(String userId);
+
+    ResponseResult<String> deleteWorkspace(String workspaceId);
 }

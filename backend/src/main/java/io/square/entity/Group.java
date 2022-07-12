@@ -73,6 +73,8 @@ public class Group implements Serializable {
      */
     @TableField("scope_id")
     private String scopeId;
+    @TableField(exist = false)
+    private String resourceId;
 
     @TableField(exist = false)
     private List<String> types = new ArrayList<>();

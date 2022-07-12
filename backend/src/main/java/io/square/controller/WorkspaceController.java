@@ -59,4 +59,9 @@ public class WorkspaceController {
     public ResponseResult<List<Workspace>> getWorkspaceListByUserId(@PathVariable String userId) {
         return service.getWorkspaceListByUserId(userId);
     }
+
+    @GetMapping("special/delete/{workspaceId}")
+    public ResponseResult<String> deleteWorkspaceByAdmin(@PathVariable String workspaceId) {
+        return service.deleteWorkspace(workspaceId);
+    }
 }

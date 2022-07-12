@@ -23,4 +23,10 @@ public interface CustomFieldService extends IService<CustomField> {
     ResponseResult<Map<String, Object>> listPageData(QueryCustomFieldRequest request, Long page, Long limit);
 
     List<CustomField> getCustomFieldByTemplateId(String id);
+
+    ResponseResult<Map<String, Object>> listRelate(QueryCustomFieldRequest request, Long page, Long limit);
+
+    ResponseResult<List<CustomField>> list(QueryCustomFieldRequest request);
+
+    ResponseResult<List<CustomField>> getDefaultField(QueryCustomFieldRequest request);
 }

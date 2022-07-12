@@ -36,7 +36,7 @@ public class CustomField implements Serializable {
     /**
      * Custom field name
      */
-    @TableField("name")
+    @TableField("`name`")
     private String name;
 
     /**
@@ -60,7 +60,7 @@ public class CustomField implements Serializable {
     /**
      * Test resource pool status
      */
-    @TableField("options")
+    @TableField("`options`")
     private String options;
 
     /**
@@ -72,7 +72,7 @@ public class CustomField implements Serializable {
     /**
      * Is global custom field
      */
-    @TableField("global")
+    @TableField("`global`")
     private Boolean global;
 
     /**

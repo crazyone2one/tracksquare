@@ -34,7 +34,7 @@ public class TestCaseTemplate implements Serializable {
     /**
      * Field template name
      */
-    @TableField("name")
+    @TableField("`name`")
     private String name;
 
     /**
@@ -64,7 +64,7 @@ public class TestCaseTemplate implements Serializable {
     /**
      * Is global template
      */
-    @TableField("global")
+    @TableField("`global`")
     private Boolean global;
 
     /**

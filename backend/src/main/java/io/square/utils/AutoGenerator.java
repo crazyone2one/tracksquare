@@ -37,7 +37,7 @@ public class AutoGenerator {
                             .pathInfo(Collections.singletonMap(OutputFile.xml, path+"/src/main/resources/mapper")).build();
                 })
                 .strategyConfig(builder -> {
-                    builder.addInclude("group").addTablePrefix("")
+                    builder.addInclude("user_group_permission").addTablePrefix("")
                             .serviceBuilder().formatServiceFileName("%sService").formatServiceImplFileName("%sServiceImpl")
                             .entityBuilder().enableLombok().logicDeleteColumnName("deleted").enableTableFieldAnnotation().idType(IdType.ASSIGN_UUID)
                             .controllerBuilder().formatFileName("%sController").enableRestStyle()

@@ -1,8 +1,8 @@
 package io.square.controller;
 
 import io.square.common.ResponseResult;
+import io.square.dto.GroupPermissionDTO;
 import io.square.entity.Group;
-import io.square.entity.UserGroup;
 import io.square.service.GroupService;
 import io.square.service.UserGroupService;
 import org.springframework.web.bind.annotation.*;
@@ -28,7 +28,7 @@ public class UserGroupController {
     GroupService groupService;
 
     @GetMapping("/list/ws/{workspaceId}/{userId}")
-    public ResponseResult<List<UserGroup>> getWorkspaceMemberGroups(@PathVariable String userId, @PathVariable String workspaceId) {
+    public ResponseResult<List<Group>> getWorkspaceMemberGroups(@PathVariable String userId, @PathVariable String workspaceId) {
         return service.getWorkspaceMemberGroups(workspaceId, userId);
     }
 
@@ -55,5 +55,29 @@ public class UserGroupController {
     @GetMapping("/source/{userId}/{groupId}")
     public ResponseResult<List<?>> getGroupSource(@PathVariable String groupId, @PathVariable String userId) {
         return service.getGroupSource(groupId, userId);
+    }
+
+    @GetMapping("/all/{userId}")
+    public ResponseResult<List<Map<String, Object>>> getAllUserGroup(@PathVariable String userId) {
+        return service.getAllUserGroup(userId);
+    }
+
+    @PostMapping("/list")
+    public ResponseResult<List<Group>> getGroupsByType(@RequestBody Group request) {
+        return service.getGroupsByType(request);
+    }
+    @PostMapping("/get")
+    public ResponseResult<List<Group>> getGroupByType(@RequestBody Group request) {
+        return service.getGroupByType(request);
+    }
+
+    @PostMapping("/permission")
+    public ResponseResult<GroupPermissionDTO> getGroupResource(@RequestBody Group group) {
+        return service.getGroupResource(group);
+    }
+
+    @GetMapping("/list/project/{projectId}/{userId}")
+    public ResponseResult<List<Group>> getProjectMemberGroups(@PathVariable String projectId, @PathVariable String userId) {
+        return service.getProjectMemberGroups(projectId, userId);
     }
 }

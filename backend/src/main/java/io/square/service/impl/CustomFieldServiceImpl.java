@@ -1,6 +1,7 @@
 package io.square.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import io.square.common.ResponseResult;
@@ -9,13 +10,13 @@ import io.square.entity.CustomField;
 import io.square.exception.BizException;
 import io.square.mapper.CustomFieldMapper;
 import io.square.service.CustomFieldService;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * <p>
@@ -52,6 +53,48 @@ public class CustomFieldServiceImpl extends ServiceImpl<CustomFieldMapper, Custo
     @Override
     public List<CustomField> getCustomFieldByTemplateId(String id) {
         return null;
+    }
+
+    @Override
+    public ResponseResult<Map<String, Object>> listRelate(QueryCustomFieldRequest request, Long page, Long limit) {
+        List<String> templateContainIds = request.getTemplateContainIds();
+        if (CollectionUtils.isEmpty(templateContainIds)) {
+            templateContainIds = new ArrayList<>();
+        }
+        request.setTemplateContainIds(templateContainIds);
+        IPage<CustomField> iPage = baseMapper.searchByCondition(new Page<>(page, limit), request);
+        Map<String, Object> response = new LinkedHashMap<>();
+        response.put("total", iPage.getTotal());
+        response.put("records", iPage.getRecords());
+        return ResponseResult.success(response);
+    }
+
+    @Override
+    public ResponseResult<List<CustomField>> list(QueryCustomFieldRequest request) {
+        return ResponseResult.success(baseMapper.list(request));
+    }
+
+    @Override
+    public ResponseResult<List<CustomField>> getDefaultField(QueryCustomFieldRequest request) {
+        LambdaQueryWrapper<CustomField> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(CustomField::getScene, request.getScene()).eq(CustomField::getSystem, true).eq(CustomField::getProjectId, request.getProjectId());
+        List<CustomField> workspaceSystemFields = baseMapper.selectList(wrapper);
+        Set<String> workspaceSystemFieldNames = workspaceSystemFields.stream()
+                .map(CustomField::getName)
+                .collect(Collectors.toSet());
+        List<CustomField> globalFields = getGlobalField(request.getScene());
+        globalFields.forEach(item -> {
+            if (!workspaceSystemFieldNames.contains(item.getName())) {
+                workspaceSystemFields.add(item);
+            }
+        });
+        return ResponseResult.success(workspaceSystemFields);
+    }
+
+    private List<CustomField> getGlobalField(String scene) {
+        LambdaQueryWrapper<CustomField> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(CustomField::getGlobal, true).eq(CustomField::getScene, scene);
+        return baseMapper.selectList(wrapper);
     }
 
     private void checkExist(CustomField customField) {

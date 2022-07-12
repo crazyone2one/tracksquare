@@ -28,6 +28,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * <p>
@@ -139,6 +140,22 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
             nameMap.put(k, v.getName());
         });
         return nameMap;
+    }
+
+    @Override
+    public void deleteByWorkspace(String workspaceId) {
+        LambdaQueryWrapper<Project> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(Project::getWorkspaceId, workspaceId);
+        List<Project> projects = baseMapper.selectList(wrapper);
+        if (CollectionUtils.isNotEmpty(projects)) {
+            List<String> projectIdList = projects.stream().map(Project::getId).collect(Collectors.toList());
+            projectIdList.forEach(id -> baseMapper.deleteById(id));
+        }
+    }
+
+    @Override
+    public List<Project> getProjectByWrapper(LambdaQueryWrapper<Project> wrapper) {
+        return baseMapper.selectList(wrapper);
     }
 
     public void addProjectVersion(Project project) {

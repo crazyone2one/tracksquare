@@ -15,6 +15,7 @@ import io.square.entity.UserGroup;
 import io.square.entity.Workspace;
 import io.square.exception.BizException;
 import io.square.mapper.*;
+import io.square.service.ProjectService;
 import io.square.service.WorkspaceService;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -49,7 +50,7 @@ public class WorkspaceServiceImpl extends ServiceImpl<WorkspaceMapper, Workspace
     @Resource
     WorkspaceMapper workspaceMapper;
     @Resource
-    ProjectMapper projectMapper;
+    ProjectService projectService;
 
     @Override
     public ResponseResult<Workspace> saveWorkspace(Workspace workspace) {
@@ -59,7 +60,7 @@ public class WorkspaceServiceImpl extends ServiceImpl<WorkspaceMapper, Workspace
         checkWorkspace(workspace);
         if (StringUtils.isNotBlank(workspace.getId())) {
             baseMapper.updateById(workspace);
-        }else {
+        } else {
             baseMapper.insert(workspace);
             // 创建工作空间为当前用户添加用户组
             UserGroup build = UserGroup.builder().userId(workspace.getCreateUser()).groupId(UserGroupConstants.WS_ADMIN)
@@ -117,12 +118,12 @@ public class WorkspaceServiceImpl extends ServiceImpl<WorkspaceMapper, Workspace
 
             if (!StringUtils.equals(workspaceId, "global")) {
                 LambdaQueryWrapper<Workspace> wrapper = new LambdaQueryWrapper<>();
-                wrapper.eq( Workspace::getId, workspaceId);
+                wrapper.eq(Workspace::getId, workspaceId);
                 List<Workspace> workspaces = workspaceMapper.selectList(wrapper);
                 List<String> list = workspaces.stream().map(Workspace::getId).collect(Collectors.toList());
                 pm.in(Project::getWorkspaceId, list);
             }
-            List<Project> projects = projectMapper.selectList(pm);
+            List<Project> projects = projectService.getProjectByWrapper(pm);
             resource.setProjects(projects);
         }
 
@@ -137,12 +138,25 @@ public class WorkspaceServiceImpl extends ServiceImpl<WorkspaceMapper, Workspace
                 .map(RelatedSource::getWorkspaceId)
                 .distinct()
                 .collect(Collectors.toList());
-        if (CollectionUtils.isEmpty(wsIds)){
+        if (CollectionUtils.isEmpty(wsIds)) {
             return ResponseResult.success(new ArrayList<>());
         }
         LambdaQueryWrapper<Workspace> wrapper = new LambdaQueryWrapper<>();
         wrapper.in(CollectionUtils.isNotEmpty(wsIds), Workspace::getId, wsIds);
         return ResponseResult.success(baseMapper.selectList(wrapper));
+    }
+
+    @Override
+    public ResponseResult<String> deleteWorkspace(String workspaceId) {
+        // delete project
+        projectService.deleteByWorkspace(workspaceId);
+        // delete user group
+        LambdaQueryWrapper<UserGroup> userGroupLambdaQueryWrapper = new LambdaQueryWrapper<>();
+        userGroupLambdaQueryWrapper.eq(UserGroup::getSourceId, workspaceId);
+        userGroupMapper.delete(userGroupLambdaQueryWrapper);
+        // delete workspace
+        baseMapper.deleteById(workspaceId);
+        return ResponseResult.success();
     }
 
     private void checkWorkspace(Workspace workspace) {

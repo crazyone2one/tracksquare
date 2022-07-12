@@ -40,4 +40,13 @@ public class SessionUtils {
         User byUsername = userMapper.findByUsername(request.getUserPrincipal().getName());
         return byUsername.getLastWorkspaceId();
     }
+
+    public String getUserId() {
+        return getUser().getId();
+    }
+
+    public User getUser() {
+        HttpServletRequest request = ((ServletRequestAttributes) (RequestContextHolder.currentRequestAttributes())).getRequest();
+        return userMapper.findByUsername(request.getUserPrincipal().getName());
+    }
 }
